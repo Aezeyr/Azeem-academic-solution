@@ -1,0 +1,19 @@
+{
+  "name": "Azeem Academic Solution",
+  "short_name": "Azeem Academic",
+  "description": "A free research article finder for verified qualitative and quantitative sources.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#14213d",
+  "background_color": "#fafbfc",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Qualitative search", "short_name": "Qualitative", "url": "/?method=qualitative", "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Quantitative search", "short_name": "Quantitative", "url": "/?method=quantitative", "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

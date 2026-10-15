@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#14213d" />
+    <meta name="description" content="Azeem Academic Solution helps students find verified qualitative and quantitative research articles from OpenAlex, Crossref, and Semantic Scholar." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://azeem-academic-solution.aezeyr7.workers.dev/" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/assets/icon-192.png" />
+    <link rel="icon" type="image/png" href="/assets/icon-192.png" />
+    <link rel="preconnect" href="https://api.openalex.org" />
+    <link rel="preconnect" href="https://api.crossref.org" />
+    <link rel="preconnect" href="https://api.semanticscholar.org" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Azeem Academic Solution | Verified Research Article Finder</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Azeem Academic Solution",
+        "url": "https://azeem-academic-solution.aezeyr7.workers.dev/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "description": "A free research article finder for verified qualitative and quantitative academic sources."
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Azeem Academic Solution home">
+        <span class="brand-mark">A</span>
+        <span><strong>Azeem Academic</strong><small>Solution</small></span>
+      </a>
+      <button class="install-button" id="installButton" type="button" hidden>Install app</button>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">YOUR SUCCESS, OUR MISSION</p>
+          <h1 id="page-title">Find research you can <em>trust.</em></h1>
+          <p class="lede">Search verified academic literature across three trusted indexes. Start with a topic, choose your method, and follow real DOI and free-PDF links when they exist.</p>
+          <div class="trust-row" aria-label="Data sources">
+            <span>OpenAlex</span><span>Crossref</span><span>Semantic Scholar</span>
+          </div>
+        </div>
+        <div class="hero-note"><span class="note-number">01</span><strong>Qualitative first</strong><p>Explore experiences, meanings, contexts, and voices with a deliberate method filter.</p></div>
+      </section>
+
+      <section class="search-panel" aria-labelledby="search-title">
+        <div class="panel-heading"><div><p class="eyebrow">ACADEMIC DISCOVERY</p><h2 id="search-title">What are you researching?</h2></div><span class="live-dot">Live provider search</span></div>
+        <form id="searchForm" class="search-form">
+          <label class="topic-field">Topic or research question<input id="topic" name="topic" type="search" required minlength="3" placeholder="e.g. teacher motivation in public schools" autocomplete="off" /></label>
+          <div class="form-row">
+            <fieldset><legend>Method</legend><div class="method-options"><label><input type="radio" name="method" value="qualitative" checked /><span>Qualitative</span></label><label><input type="radio" name="method" value="quantitative" /><span>Quantitative</span></label><label><input type="radio" name="method" value="any" /><span>Any method</span></label></div></fieldset>
+            <label class="year-field">Publication year (optional)<input id="year" name="year" type="number" min="1900" max="2100" placeholder="e.g. 2024" /></label>
+            <button class="search-button" type="submit"><span>Search articles</span><span aria-hidden="true">↗</span></button>
+          </div>
+        </form>
+        <p class="privacy-note">Searches run in your browser. No account, login, or personal data is required.</p>
+      </section>
+
+      <section class="results-section" aria-live="polite" aria-busy="false">
+        <div class="results-heading"><div><p class="eyebrow">VERIFIED RESULTS</p><h2 id="resultsTitle">Ready when you are</h2></div><span id="resultCount" class="result-count"></span></div>
+        <div id="status" class="status-card"><span class="status-icon">⌕</span><div><strong>Begin with a focused topic</strong><p>Try a topic above. Results will show the source provider, method relevance, DOI, and available open-access PDF links.</p></div></div>
+        <div id="results" class="results-grid"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><p><strong>Azeem Academic Solution</strong> — a free, student-friendly research starting point.</p><p>Verify every source and read the original article before citing.</p></footer>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
