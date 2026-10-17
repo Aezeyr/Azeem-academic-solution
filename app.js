@@ -162,11 +162,11 @@ const openToolsMenu = () => { toolsPanel.hidden = false; toolsToggle.setAttribut
 const closeToolsMenu = () => { toolsPanel.hidden = true; toolsToggle.setAttribute("aria-expanded", "false"); };
 toolsToggle?.addEventListener("click", () => toolsPanel.hidden ? openToolsMenu() : closeToolsMenu());
 
-const defaultToolTitles = { calculator: "Scientific Calculator", gpa: "GPA Calculator", timer: "Study Timer", notes: "Notes" };
+const defaultToolTitles = { calculator: "scientificCalculator", gpa: "gpaCalculator", timer: "studyTimer", notes: "notes" };
 function openTool(tool) {
   activeTool = tool; closeToolsMenu(); toolModal.hidden = false; document.body.classList.add("modal-open");
-  toolModalTitle.textContent = defaultToolTitles[tool] || "Student tool";
-  toolModalEyebrow.textContent = tool === "notes" ? "PRIVATE ON THIS DEVICE" : "OFFLINE STUDENT TOOL";
+  toolModalTitle.textContent = t(defaultToolTitles[tool] || "studentTool");
+  toolModalEyebrow.textContent = t(tool === "notes" ? "privateOnDevice" : "offlineStudentTool");
   if (tool === "calculator") renderCalculator();
   if (tool === "gpa") renderGpa();
   if (tool === "timer") renderTimer();
@@ -246,3 +246,30 @@ function renderNotes() { const editing = notes.find((note) => note.id === editin
   document.querySelector("#deleteNote")?.addEventListener("click", () => { notes = notes.filter((note) => note.id !== editingNoteId); saveNotes(); editingNoteId = null; renderNotes(); });
   toolContent.querySelectorAll("[data-edit-note]").forEach((button) => button.addEventListener("click", () => { editingNoteId = button.dataset.editNote; renderNotes(); }));
 }
+
+
+const languageStrings = {
+  en: {
+    installApp: "Install app", studentTools: "Student tools", quickStudyDesk: "Quick study desk", scientificCalculator: "Scientific Calculator", basicScientificMath: "Basic and scientific math", gpaCalculator: "GPA Calculator", weightedGradeAverage: "Weighted grade average", studyTimer: "Study Timer", focusPauseResume: "Focus, pause, resume", notes: "Notes", savedOnDevice: "Saved on this device", tagline: "YOUR SUCCESS, OUR MISSION", findResearch: "Find research you can", trust: "trust.", heroDescription: "Search verified academic literature across three trusted indexes. Start with a topic, choose your method, and follow real DOI and free-PDF links when they exist.", qualitativeFirst: "Qualitative first", qualitativeDescription: "Explore experiences, meanings, contexts, and voices with a deliberate method filter.", academicDiscovery: "ACADEMIC DISCOVERY", whatResearching: "What are you researching?", liveProviderSearch: "Live provider search", topicQuestion: "Topic or research question", method: "Method", qualitative: "Qualitative", quantitative: "Quantitative", anyMethod: "Any method", fromYear: "From Year", toYear: "To Year", searchArticles: "Search articles", privacyNote: "Searches run in your browser. No account, login, or personal data is required.", verifiedResults: "VERIFIED RESULTS", readyWhenYouAre: "Ready when you are", beginFocusedTopic: "Begin with a focused topic", resultsHelp: "Try a topic above. Results will show the source provider, method relevance, DOI, and available open-access PDF links.", scientificCalculator: "Scientific Calculator", studentTool: "Student tool", privateOnDevice: "PRIVATE ON THIS DEVICE", offlineStudentTool: "OFFLINE STUDENT TOOL"
+  },
+  ur: {
+    installApp: "ایپ انسٹال کریں", studentTools: "طلبہ کے ٹولز", quickStudyDesk: "فوری مطالعاتی ڈیسک", scientificCalculator: "سائنسی کیلکولیٹر", basicScientificMath: "بنیادی اور سائنسی حساب", gpaCalculator: "GPA کیلکولیٹر", weightedGradeAverage: "کریڈٹس کے حساب سے اوسط", studyTimer: "مطالعہ ٹائمر", focusPauseResume: "شروع، وقفہ اور دوبارہ شروع", notes: "نوٹس", savedOnDevice: "اس ڈیوائس پر محفوظ", tagline: "آپ کی کامیابی، ہمارا مشن", findResearch: "قابلِ اعتماد تحقیق", trust: "تلاش کریں۔", heroDescription: "تین معتبر اشاریوں سے تصدیق شدہ علمی لٹریچر تلاش کریں۔ موضوع منتخب کریں، طریقۂ تحقیق چنیں اور اصل DOI یا دستیاب مفت PDF تک پہنچیں۔", qualitativeFirst: "معیاری تحقیق پہلے", qualitativeDescription: "تجربات، معانی، سیاق و سباق اور آوازوں کو معیاری طریقۂ تحقیق کے ساتھ دریافت کریں۔", academicDiscovery: "علمی دریافت", whatResearching: "آپ کس موضوع پر تحقیق کر رہے ہیں؟", liveProviderSearch: "لائیو فراہم کنندگان کی تلاش", topicQuestion: "موضوع یا تحقیقی سوال", method: "طریقۂ تحقیق", qualitative: "معیاری", quantitative: "مقداری", anyMethod: "کوئی بھی طریقہ", fromYear: "ابتدائی سال", toYear: "آخری سال", searchArticles: "مضامین تلاش کریں", privacyNote: "تلاش آپ کے براؤزر میں ہوتی ہے۔ اکاؤنٹ، لاگ اِن یا ذاتی معلومات درکار نہیں۔", verifiedResults: "تصدیق شدہ نتائج", readyWhenYouAre: "آپ کے لیے تیار", beginFocusedTopic: "واضح موضوع سے آغاز کریں", resultsHelp: "اوپر موضوع درج کریں۔ نتائج میں ماخذ، طریقۂ تحقیق، DOI اور دستیاب اوپن ایکسس PDF لنکس دکھائے جائیں گے۔", scientificCalculator: "سائنسی کیلکولیٹر", studentTool: "طلبہ کا ٹول", privateOnDevice: "صرف اس ڈیوائس پر نجی", offlineStudentTool: "آف لائن طلبہ کا ٹول"
+  }
+};
+let currentLanguage = localStorage.getItem("azeemAcademicLanguage") === "ur" ? "ur" : "en";
+function t(key) { return languageStrings[currentLanguage]?.[key] || languageStrings.en[key] || key; }
+function applyLanguage() {
+  document.documentElement.lang = currentLanguage === "ur" ? "ur" : "en";
+  document.documentElement.dir = currentLanguage === "ur" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
+  const topic = document.querySelector("#topic");
+  if (topic) topic.placeholder = currentLanguage === "ur" ? "مثلاً سرکاری اسکولوں میں اساتذہ کی حوصلہ افزائی" : "e.g. teacher motivation in public schools";
+  const from = document.querySelector("#fromYear"); const to = document.querySelector("#toYear");
+  if (from) from.placeholder = currentLanguage === "ur" ? "مثلاً 2018" : "e.g. 2018";
+  if (to) to.placeholder = currentLanguage === "ur" ? "مثلاً 2024" : "e.g. 2024";
+  const toggle = document.querySelector("#languageToggle");
+  if (toggle) { toggle.setAttribute("aria-label", currentLanguage === "ur" ? "Switch to English" : "زبان اردو میں تبدیل کریں"); toggle.title = currentLanguage === "ur" ? "Switch to English" : "اردو"; }
+  if (!toolModal.hidden && activeTool) openTool(activeTool);
+}
+document.querySelector("#languageToggle")?.addEventListener("click", () => { currentLanguage = currentLanguage === "en" ? "ur" : "en"; localStorage.setItem("azeemAcademicLanguage", currentLanguage); applyLanguage(); });
+applyLanguage();

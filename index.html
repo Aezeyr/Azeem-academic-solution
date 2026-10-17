@@ -9,8 +9,8 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://azeem-academic-solution.aezeyr7.workers.dev/" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/assets/icon-192.png" />
-    <link rel="icon" type="image/png" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/azeem-academic-solution-logo.jpeg" />
+    <link rel="icon" type="image/jpeg" href="/assets/azeem-academic-solution-logo.jpeg" />
     <link rel="preconnect" href="https://api.openalex.org" />
     <link rel="preconnect" href="https://api.crossref.org" />
     <link rel="preconnect" href="https://api.semanticscholar.org" />
@@ -31,55 +31,54 @@
   <body>
     <header class="site-header">
       <a class="brand" href="/" aria-label="Azeem Academic Solution home">
-        <span class="brand-mark">A</span>
-        <span><strong>Azeem Academic</strong><small>Solution</small></span>
+        <img class="brand-logo" src="/assets/azeem-academic-solution-logo.jpeg" alt="Azeem Academic Solution" />
       </a>
-      <button class="install-button" id="installButton" type="button" hidden>Install app</button>
+      <div class="header-actions"><button class="language-toggle" id="languageToggle" type="button" aria-label="Switch language"><span>EN</span><span aria-hidden="true">/</span><strong>UR</strong></button><button class="install-button" id="installButton" type="button" hidden data-i18n="installApp">Install app</button></div>
     </header>
 
     <aside class="student-tools" aria-label="Student tools">
-      <button class="tools-toggle" id="toolsToggle" type="button" aria-expanded="false" aria-controls="toolsPanel"><span class="tools-toggle-icon">✦</span><span>Student tools</span></button>
+      <button class="tools-toggle" id="toolsToggle" type="button" aria-expanded="false" aria-controls="toolsPanel"><span class="tools-toggle-icon">✦</span><span data-i18n="studentTools">Student tools</span></button>
       <div class="tools-panel" id="toolsPanel" hidden>
-        <p class="tools-panel-label">Quick study desk</p>
-        <button class="tool-button" type="button" data-tool="calculator"><span class="tool-icon">∑</span><span><strong>Scientific Calculator</strong><small>Basic and scientific math</small></span></button>
-        <button class="tool-button" type="button" data-tool="gpa"><span class="tool-icon">◎</span><span><strong>GPA Calculator</strong><small>Weighted grade average</small></span></button>
-        <button class="tool-button" type="button" data-tool="timer"><span class="tool-icon">◷</span><span><strong>Study Timer</strong><small>Focus, pause, resume</small></span></button>
-        <button class="tool-button" type="button" data-tool="notes"><span class="tool-icon">✎</span><span><strong>Notes</strong><small>Saved on this device</small></span></button>
+        <p class="tools-panel-label" data-i18n="quickStudyDesk">Quick study desk</p>
+        <button class="tool-button" type="button" data-tool="calculator"><span class="tool-icon">∑</span><span><strong data-i18n="scientificCalculator">Scientific Calculator</strong><small data-i18n="basicScientificMath">Basic and scientific math</small></span></button>
+        <button class="tool-button" type="button" data-tool="gpa"><span class="tool-icon">◎</span><span><strong data-i18n="gpaCalculator">GPA Calculator</strong><small data-i18n="weightedGradeAverage">Weighted grade average</small></span></button>
+        <button class="tool-button" type="button" data-tool="timer"><span class="tool-icon">◷</span><span><strong data-i18n="studyTimer">Study Timer</strong><small data-i18n="focusPauseResume">Focus, pause, resume</small></span></button>
+        <button class="tool-button" type="button" data-tool="notes"><span class="tool-icon">✎</span><span><strong data-i18n="notes">Notes</strong><small data-i18n="savedOnDevice">Saved on this device</small></span></button>
       </div>
     </aside>
 
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">YOUR SUCCESS, OUR MISSION</p>
-          <h1 id="page-title">Find research you can <em>trust.</em></h1>
-          <p class="lede">Search verified academic literature across three trusted indexes. Start with a topic, choose your method, and follow real DOI and free-PDF links when they exist.</p>
+          <p class="eyebrow" data-i18n="tagline">YOUR SUCCESS, OUR MISSION</p>
+          <h1 id="page-title"><span data-i18n="findResearch">Find research you can</span> <em data-i18n="trust">trust.</em></h1>
+          <p class="lede" data-i18n="heroDescription">Search verified academic literature across three trusted indexes. Start with a topic, choose your method, and follow real DOI and free-PDF links when they exist.</p>
           <div class="trust-row" aria-label="Data sources">
             <span>OpenAlex</span><span>Crossref</span><span>Semantic Scholar</span>
           </div>
         </div>
-        <div class="hero-note"><span class="note-number">01</span><strong>Qualitative first</strong><p>Explore experiences, meanings, contexts, and voices with a deliberate method filter.</p></div>
+        <div class="hero-note"><span class="note-number">01</span><strong data-i18n="qualitativeFirst">Qualitative first</strong><p data-i18n="qualitativeDescription">Explore experiences, meanings, contexts, and voices with a deliberate method filter.</p></div>
       </section>
 
       <section class="search-panel" aria-labelledby="search-title">
-        <div class="panel-heading"><div><p class="eyebrow">ACADEMIC DISCOVERY</p><h2 id="search-title">What are you researching?</h2></div><span class="live-dot">Live provider search</span></div>
+        <div class="panel-heading"><div><p class="eyebrow" data-i18n="academicDiscovery">ACADEMIC DISCOVERY</p><h2 id="search-title" data-i18n="whatResearching">What are you researching?</h2></div><span class="live-dot" data-i18n="liveProviderSearch">Live provider search</span></div>
         <form id="searchForm" class="search-form">
-          <label class="topic-field">Topic or research question<input id="topic" name="topic" type="search" required minlength="3" placeholder="e.g. teacher motivation in public schools" autocomplete="off" /></label>
+          <label class="topic-field"><span data-i18n="topicQuestion">Topic or research question</span><input id="topic" name="topic" type="search" required minlength="3" placeholder="e.g. teacher motivation in public schools" autocomplete="off" /></label>
           <div class="form-row">
-            <fieldset><legend>Method</legend><div class="method-options"><label><input type="radio" name="method" value="qualitative" checked /><span>Qualitative</span></label><label><input type="radio" name="method" value="quantitative" /><span>Quantitative</span></label><label><input type="radio" name="method" value="any" /><span>Any method</span></label></div></fieldset>
+            <fieldset><legend data-i18n="method">Method</legend><div class="method-options"><label><input type="radio" name="method" value="qualitative" checked /><span data-i18n="qualitative">Qualitative</span></label><label><input type="radio" name="method" value="quantitative" /><span data-i18n="quantitative">Quantitative</span></label><label><input type="radio" name="method" value="any" /><span data-i18n="anyMethod">Any method</span></label></div></fieldset>
             <div class="year-range" aria-label="Publication year range">
-              <label class="year-field">From Year<input id="fromYear" name="fromYear" type="number" min="1900" max="2100" placeholder="e.g. 2018" /></label>
-              <label class="year-field">To Year<input id="toYear" name="toYear" type="number" min="1900" max="2100" placeholder="e.g. 2024" /></label>
+              <label class="year-field"><span data-i18n="fromYear">From Year</span><input id="fromYear" name="fromYear" type="number" min="1900" max="2100" placeholder="e.g. 2018" /></label>
+              <label class="year-field"><span data-i18n="toYear">To Year</span><input id="toYear" name="toYear" type="number" min="1900" max="2100" placeholder="e.g. 2024" /></label>
             </div>
-            <button class="search-button" type="submit"><span>Search articles</span><span aria-hidden="true">↗</span></button>
+            <button class="search-button" type="submit"><span data-i18n="searchArticles">Search articles</span><span aria-hidden="true">↗</span></button>
           </div>
         </form>
-        <p class="privacy-note">Searches run in your browser. No account, login, or personal data is required.</p>
+        <p class="privacy-note" data-i18n="privacyNote">Searches run in your browser. No account, login, or personal data is required.</p>
       </section>
 
       <section class="results-section" aria-live="polite" aria-busy="false">
-        <div class="results-heading"><div><p class="eyebrow">VERIFIED RESULTS</p><h2 id="resultsTitle">Ready when you are</h2></div><span id="resultCount" class="result-count"></span></div>
-        <div id="status" class="status-card"><span class="status-icon">⌕</span><div><strong>Begin with a focused topic</strong><p>Try a topic above. Results will show the source provider, method relevance, DOI, and available open-access PDF links.</p></div></div>
+        <div class="results-heading"><div><p class="eyebrow" data-i18n="verifiedResults">VERIFIED RESULTS</p><h2 id="resultsTitle" data-i18n="readyWhenYouAre">Ready when you are</h2></div><span id="resultCount" class="result-count"></span></div>
+        <div id="status" class="status-card"><span class="status-icon">⌕</span><div><strong data-i18n="beginFocusedTopic">Begin with a focused topic</strong><p data-i18n="resultsHelp">Try a topic above. Results will show the source provider, method relevance, DOI, and available open-access PDF links.</p></div></div>
         <div id="results" class="results-grid"></div>
       </section>
     </main>
