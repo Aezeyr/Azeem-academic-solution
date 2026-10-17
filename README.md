@@ -1,6 +1,6 @@
-# Azeem Academic Solution
+# Azeem Academic Hub
 
-A free, static research article finder for qualitative and quantitative thesis research. The browser queries **OpenAlex**, **Crossref**, and **Semantic Scholar** directly; the site does not require an account or backend.
+A free, static research article finder for qualitative and quantitative thesis research. The browser queries **OpenAlex**, **Crossref**, and **Semantic Scholar** directly; the site does not require an account or backend. The search supports separate From Year and To Year bounds.
 
 ## Source policy
 

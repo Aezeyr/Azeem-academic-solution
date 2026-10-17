@@ -1,5 +1,5 @@
-const CACHE = "azeem-academic-shell-v1";
-const SHELL = ["/", "/index.html", "/styles.css", "/app.js", "/manifest.webmanifest", "/offline.html", "/assets/icon-192.png", "/assets/icon-512.png", "/assets/icon-512-maskable.png"];
+const CACHE = "azeem-academic-hub-shell-v2";
+const SHELL = ["/", "/index.html", "/styles.css", "/app.js", "/manifest.webmanifest", "/offline.html", "/assets/azeem-academic-hub-logo.png", "/assets/icon-192.png", "/assets/icon-512.png", "/assets/icon-512-maskable.png"];
 self.addEventListener("install", (event) => { event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (event) => { event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (event) => {

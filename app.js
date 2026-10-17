@@ -1,6 +1,7 @@
 const form = document.querySelector("#searchForm");
 const topicInput = document.querySelector("#topic");
-const yearInput = document.querySelector("#year");
+const fromYearInput = document.querySelector("#fromYear");
+const toYearInput = document.querySelector("#toYear");
 const resultsNode = document.querySelector("#results");
 const statusNode = document.querySelector("#status");
 const resultsTitle = document.querySelector("#resultsTitle");
@@ -65,27 +66,34 @@ function normalizeSemantic(item) {
   return { title: text(item.title) || "Untitled article", authors: (item.authors || []).slice(0, 4).map((a) => a.name).filter(Boolean).join(", "), year: Number(item.year) || null, source: "Semantic Scholar", doi, doiLink: doiUrl(doi), pdf: safeUrl(oa.url), landing: safeUrl(item.url), method: "Indexed" };
 }
 
-async function fetchOpenAlex(query, year) {
+async function fetchOpenAlex(query, fromYear, toYear) {
   const url = new URL("https://api.openalex.org/works");
   url.searchParams.set("search", query); url.searchParams.set("per-page", "12");
   url.searchParams.set("select", "id,doi,title,publication_year,authorships,open_access,best_oa_location");
-  if (year) url.searchParams.set("filter", `from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`);
+  const filters = [];
+  if (fromYear) filters.push(`from_publication_date:${fromYear}-01-01`);
+  if (toYear) filters.push(`to_publication_date:${toYear}-12-31`);
+  if (filters.length) url.searchParams.set("filter", filters.join(","));
   const response = await fetch(url); if (!response.ok) throw new Error(`OpenAlex ${response.status}`);
   return (await response.json()).results.map(normalizeOpenAlex);
 }
-async function fetchCrossref(query, year) {
+async function fetchCrossref(query, fromYear, toYear) {
   const url = new URL("https://api.crossref.org/works");
   url.searchParams.set("query.bibliographic", query); url.searchParams.set("rows", "12");
   url.searchParams.set("select", "DOI,title,author,published,published-print,published-online,URL,link");
-  if (year) { url.searchParams.set("filter", `from-pub-date:${year}-01-01,until-pub-date:${year}-12-31`); }
+  const filters = [];
+  if (fromYear) filters.push(`from-pub-date:${fromYear}-01-01`);
+  if (toYear) filters.push(`until-pub-date:${toYear}-12-31`);
+  if (filters.length) url.searchParams.set("filter", filters.join(","));
   const response = await fetch(url); if (!response.ok) throw new Error(`Crossref ${response.status}`);
   return (await response.json()).message.items.map(normalizeCrossref);
 }
-async function fetchSemantic(query, year) {
+async function fetchSemantic(query, fromYear, toYear) {
   const url = new URL("https://api.semanticscholar.org/graph/v1/paper/search");
   url.searchParams.set("query", query); url.searchParams.set("limit", "12");
   url.searchParams.set("fields", "title,authors,year,externalIds,url,openAccessPdf");
-  if (year) { url.searchParams.set("year", `${year}`); }
+  // Semantic Scholar supports closed ranges. Open-ended bounds are applied locally below.
+  if (fromYear && toYear) url.searchParams.set("year", `${fromYear}-${toYear}`);
   const response = await fetch(url); if (!response.ok) throw new Error(`Semantic Scholar ${response.status}`);
   return (await response.json()).data.map(normalizeSemantic);
 }
@@ -112,12 +120,20 @@ function renderResults(items, topic) {
 }
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const topic = clean(topicInput.value); const method = document.querySelector("input[name=method]:checked")?.value || "any"; const year = clean(yearInput.value);
+  const topic = clean(topicInput.value); const method = document.querySelector("input[name=method]:checked")?.value || "any";
+  const fromYear = Number.parseInt(clean(fromYearInput.value), 10) || null;
+  const toYear = Number.parseInt(clean(toYearInput.value), 10) || null;
   if (topic.length < 3) return;
+  if (fromYear && toYear && fromYear > toYear) {
+    resultsNode.innerHTML = "";
+    resultCount.textContent = "";
+    renderStatus("Invalid year range", "From Year must be earlier than or equal to To Year.", true);
+    return;
+  }
   resultsSection.setAttribute("aria-busy", "true"); resultsNode.innerHTML = ""; resultCount.textContent = ""; renderStatus("Searching trusted indexes…", "OpenAlex, Crossref, and Semantic Scholar are being queried directly from your browser.");
   const query = methodQuery(topic, method);
-  const responses = await Promise.allSettled([fetchOpenAlex(query, year), fetchCrossref(query, year), fetchSemantic(query, year)]);
-  const items = responses.flatMap((result) => result.status === "fulfilled" ? result.value : []);
+  const responses = await Promise.allSettled([fetchOpenAlex(query, fromYear, toYear), fetchCrossref(query, fromYear, toYear), fetchSemantic(query, fromYear, toYear)]);
+  const items = responses.flatMap((result) => result.status === "fulfilled" ? result.value : []).filter((item) => (!fromYear || (item.year && item.year >= fromYear)) && (!toYear || (item.year && item.year <= toYear)));
   const failed = responses.filter((result) => result.status === "rejected").length;
   if (!items.length) renderStatus("No records returned", failed === 3 ? "The providers could not be reached. Check your internet connection and try again." : "Try a broader topic or remove the year filter.", true);
   else { const ranked = rankAndDeduplicate(items, method); renderResults(ranked, topic); if (failed) resultCount.textContent += ` · ${failed} provider unavailable`; }
