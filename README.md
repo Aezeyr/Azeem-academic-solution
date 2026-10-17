@@ -2,6 +2,10 @@
 
 A free, static research article finder for qualitative and quantitative thesis research. The browser queries **OpenAlex**, **Crossref**, and **Semantic Scholar** directly; the site does not require an account or backend.
 
+## Offline student tools
+
+The floating Student tools menu adds a scientific calculator, weighted GPA calculator, study timer, and local notes. These utilities do not call the academic providers or require login. Notes stay in this browser's local storage and are not uploaded.
+
 ## Source policy
 
 - Search results are normalized only from provider responses.

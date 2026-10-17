@@ -37,6 +37,17 @@
       <button class="install-button" id="installButton" type="button" hidden>Install app</button>
     </header>
 
+    <aside class="student-tools" aria-label="Student tools">
+      <button class="tools-toggle" id="toolsToggle" type="button" aria-expanded="false" aria-controls="toolsPanel"><span class="tools-toggle-icon">✦</span><span>Student tools</span></button>
+      <div class="tools-panel" id="toolsPanel" hidden>
+        <p class="tools-panel-label">Quick study desk</p>
+        <button class="tool-button" type="button" data-tool="calculator"><span class="tool-icon">∑</span><span><strong>Scientific Calculator</strong><small>Basic and scientific math</small></span></button>
+        <button class="tool-button" type="button" data-tool="gpa"><span class="tool-icon">◎</span><span><strong>GPA Calculator</strong><small>Weighted grade average</small></span></button>
+        <button class="tool-button" type="button" data-tool="timer"><span class="tool-icon">◷</span><span><strong>Study Timer</strong><small>Focus, pause, resume</small></span></button>
+        <button class="tool-button" type="button" data-tool="notes"><span class="tool-icon">✎</span><span><strong>Notes</strong><small>Saved on this device</small></span></button>
+      </div>
+    </aside>
+
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
@@ -72,6 +83,14 @@
         <div id="results" class="results-grid"></div>
       </section>
     </main>
+
+    <div class="tool-modal" id="toolModal" role="dialog" aria-modal="true" aria-labelledby="toolModalTitle" hidden>
+      <div class="tool-modal-backdrop" data-close-tool></div>
+      <section class="tool-modal-card">
+        <div class="tool-modal-header"><div><p class="eyebrow" id="toolModalEyebrow">STUDENT TOOL</p><h2 id="toolModalTitle">Student tool</h2></div><button class="modal-close" type="button" data-close-tool aria-label="Close student tool">×</button></div>
+        <div class="tool-modal-content" id="toolContent"></div>
+      </section>
+    </div>
 
     <footer class="site-footer"><p><strong>Azeem Academic Solution</strong> — a free, student-friendly research starting point.</p><p>Verify every source and read the original article before citing.</p></footer>
     <script src="/app.js" defer></script>

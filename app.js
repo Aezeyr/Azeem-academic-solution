@@ -147,3 +147,102 @@ if (["qualitative", "quantitative", "any"].includes(shortcutMethod)) {
   if (radio) radio.checked = true;
 }
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+
+
+// Offline student tools: these modules use browser state only and do not call the article APIs.
+const toolsToggle = document.querySelector("#toolsToggle");
+const toolsPanel = document.querySelector("#toolsPanel");
+const toolModal = document.querySelector("#toolModal");
+const toolContent = document.querySelector("#toolContent");
+const toolModalTitle = document.querySelector("#toolModalTitle");
+const toolModalEyebrow = document.querySelector("#toolModalEyebrow");
+let activeTool = "";
+
+const openToolsMenu = () => { toolsPanel.hidden = false; toolsToggle.setAttribute("aria-expanded", "true"); };
+const closeToolsMenu = () => { toolsPanel.hidden = true; toolsToggle.setAttribute("aria-expanded", "false"); };
+toolsToggle?.addEventListener("click", () => toolsPanel.hidden ? openToolsMenu() : closeToolsMenu());
+
+const defaultToolTitles = { calculator: "Scientific Calculator", gpa: "GPA Calculator", timer: "Study Timer", notes: "Notes" };
+function openTool(tool) {
+  activeTool = tool; closeToolsMenu(); toolModal.hidden = false; document.body.classList.add("modal-open");
+  toolModalTitle.textContent = defaultToolTitles[tool] || "Student tool";
+  toolModalEyebrow.textContent = tool === "notes" ? "PRIVATE ON THIS DEVICE" : "OFFLINE STUDENT TOOL";
+  if (tool === "calculator") renderCalculator();
+  if (tool === "gpa") renderGpa();
+  if (tool === "timer") renderTimer();
+  if (tool === "notes") renderNotes();
+}
+function closeTool() { toolModal.hidden = true; document.body.classList.remove("modal-open"); activeTool = ""; }
+document.querySelectorAll("[data-tool]").forEach((button) => button.addEventListener("click", () => openTool(button.dataset.tool)));
+toolModal?.addEventListener("click", (event) => { if (event.target.matches("[data-close-tool]")) closeTool(); });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !toolModal.hidden) closeTool(); });
+
+function evaluateMath(source) {
+  const tokens = source.replace(/\s+/g, "").match(/(?:\d+(?:\.\d*)?|\.\d+|[A-Za-z]+|[()+\-*/%^!])/g) || [];
+  if (!tokens.length || tokens.join("") !== source.replace(/\s+/g, "")) throw new Error("Invalid expression");
+  let position = 0;
+  const peek = () => tokens[position];
+  const take = () => tokens[position++];
+  const primary = () => {
+    const token = take();
+    if (token === "(") { const value = expression(); if (take() !== ")") throw new Error("Missing parenthesis"); return value; }
+    if (/^\d|^\./.test(token || "")) return Number(token);
+    if (/^[A-Za-z]+$/.test(token || "")) {
+      if (token.toLowerCase() === "pi") return Math.PI;
+      if (token.toLowerCase() === "e") return Math.E;
+      if (take() !== "(") throw new Error("Function needs parentheses");
+      const value = expression(); if (take() !== ")") throw new Error("Missing parenthesis");
+      const functions = { sin: (n) => Math.sin(n * Math.PI / 180), cos: (n) => Math.cos(n * Math.PI / 180), tan: (n) => Math.tan(n * Math.PI / 180), sqrt: Math.sqrt, log: Math.log10, ln: Math.log, abs: Math.abs };
+      if (!functions[token.toLowerCase()]) throw new Error("Unknown function");
+      return functions[token.toLowerCase()](value);
+    }
+    throw new Error("Invalid expression");
+  };
+  const power = () => { let value = primary(); if (peek() === "!") { while (peek() === "!") { take(); if (value < 0 || value > 170 || value % 1) throw new Error("Invalid factorial"); let result = 1; for (let i = 2; i <= value; i += 1) result *= i; value = result; } } if (peek() === "^") { take(); value = Math.pow(value, power()); } return value; };
+  const unary = () => { if (peek() === "+") { take(); return unary(); } if (peek() === "-") { take(); return -unary(); } return power(); };
+  const term = () => { let value = unary(); while (["*", "/", "%"].includes(peek())) { const operator = take(); const next = unary(); if (operator === "*") value *= next; if (operator === "/") value /= next; if (operator === "%") value %= next; } return value; };
+  const expression = () => { let value = term(); while (["+", "-"].includes(peek())) { const operator = take(); const next = term(); value = operator === "+" ? value + next : value - next; } return value; };
+  const answer = expression();
+  if (position !== tokens.length || !Number.isFinite(answer)) throw new Error("Invalid result");
+  return answer;
+}
+function numberText(value) { return Number.isInteger(value) ? String(value) : String(Number(value.toPrecision(12))); }
+const calculatorState = { expression: "", display: "0" };
+function renderCalculator() {
+  toolContent.innerHTML = `<div class="calc-display" id="calcDisplay" aria-live="polite">${escapeHtml(calculatorState.display)}</div><p class="calc-hint">Trigonometric functions use degrees. Try <strong>sin(30)</strong>, <strong>sqrt(25)</strong>, or <strong>2^3</strong>.</p><div class="calc-grid">${["sin(","cos(","tan(","sqrt(","log(","7","8","9","/","AC","4","5","6","*","⌫","1","2","3","-","(","0",".","π",")","+","%","^","!","="] .map((key) => `<button class="calc-key ${/[A-Za-zπ]/.test(key) ? "function" : ""} ${key === "=" ? "equals" : ""} ${key === "AC" ? "wide" : ""}" type="button" data-calc="${key}">${key}</button>`).join("")}</div>`;
+  toolContent.querySelectorAll("[data-calc]").forEach((button) => button.addEventListener("click", () => handleCalculator(button.dataset.calc)));
+}
+function handleCalculator(key) {
+  if (key === "AC") { calculatorState.expression = ""; calculatorState.display = "0"; }
+  else if (key === "⌫") { calculatorState.expression = calculatorState.expression.slice(0, -1); calculatorState.display = calculatorState.expression || "0"; }
+  else if (key === "=") { try { calculatorState.display = numberText(evaluateMath(calculatorState.expression.replaceAll("π", "pi"))); calculatorState.expression = calculatorState.display; } catch { calculatorState.display = "Error"; } }
+  else { calculatorState.expression += key; calculatorState.display = calculatorState.expression.replaceAll("pi", "π") || "0"; }
+  const display = document.querySelector("#calcDisplay"); if (display) display.textContent = calculatorState.display;
+}
+
+let gpaRows = [{ name: "", grade: "", credits: "" }, { name: "", grade: "", credits: "" }, { name: "", grade: "", credits: "" }];
+function renderGpa(result = "") {
+  toolContent.innerHTML = `<p class="calc-hint">Enter each course's grade point and credit hours. GPA is calculated as Σ(grade point × credits) ÷ Σ credits.</p><table class="gpa-table"><thead><tr><th>Course</th><th>Grade point</th><th>Credits</th><th></th></tr></thead><tbody>${gpaRows.map((row, index) => `<tr><td><input data-gpa="name" data-row="${index}" value="${escapeHtml(row.name)}" placeholder="Course ${index + 1}" /></td><td><input data-gpa="grade" data-row="${index}" type="number" min="0" max="4" step="0.01" value="${escapeHtml(row.grade)}" placeholder="3.5" /></td><td><input data-gpa="credits" data-row="${index}" type="number" min="0" step="0.5" value="${escapeHtml(row.credits)}" placeholder="3" /></td><td><button class="gpa-remove" type="button" data-remove-gpa="${index}" aria-label="Remove course">×</button></td></tr>`).join("")}</tbody></table><div class="tool-actions"><button class="tool-secondary" type="button" id="addGpaRow">+ Add course</button><button class="tool-primary" type="button" id="calculateGpa">Calculate GPA</button></div><div class="gpa-result" id="gpaResult" ${result ? "" : "hidden"}>${result}</div>`;
+  toolContent.querySelectorAll("[data-gpa]").forEach((input) => input.addEventListener("input", () => { gpaRows[Number(input.dataset.row)][input.dataset.gpa] = input.value; }));
+  toolContent.querySelectorAll("[data-remove-gpa]").forEach((button) => button.addEventListener("click", () => { if (gpaRows.length > 1) { gpaRows.splice(Number(button.dataset.removeGpa), 1); renderGpa(); } }));
+  document.querySelector("#addGpaRow").addEventListener("click", () => { gpaRows.push({ name: "", grade: "", credits: "" }); renderGpa(); });
+  document.querySelector("#calculateGpa").addEventListener("click", () => { const valid = gpaRows.map((row) => ({ grade: Number(row.grade), credits: Number(row.credits) })).filter((row) => row.credits > 0 && Number.isFinite(row.grade)); const credits = valid.reduce((sum, row) => sum + row.credits, 0); const points = valid.reduce((sum, row) => sum + row.grade * row.credits, 0); const resultNode = document.querySelector("#gpaResult"); if (!valid.length || !credits) { resultNode.textContent = "Enter at least one course with grade points and credit hours."; } else { resultNode.innerHTML = `<strong>${(points / credits).toFixed(2)}</strong> GPA <span>· ${credits} weighted credits</span>`; } resultNode.hidden = false; });
+}
+
+const timerState = { seconds: 25 * 60, duration: 25 * 60, interval: null, running: false };
+function timerText() { const minutes = Math.floor(timerState.seconds / 60).toString().padStart(2, "0"); const seconds = (timerState.seconds % 60).toString().padStart(2, "0"); return `${minutes}:${seconds}`; }
+function updateTimerDisplay() { const display = document.querySelector("#timerDisplay"); const status = document.querySelector("#timerStatus"); if (display) display.textContent = timerText(); if (status) status.textContent = timerState.seconds === 0 ? "Session complete" : timerState.running ? "Focus mode is running" : "Ready when you are"; }
+function stopTimerInterval() { if (timerState.interval) { clearInterval(timerState.interval); timerState.interval = null; } timerState.running = false; }
+function startTimer() { if (timerState.seconds === 0) timerState.seconds = timerState.duration; timerState.running = true; if (!timerState.interval) timerState.interval = setInterval(() => { if (timerState.seconds > 0) timerState.seconds -= 1; if (timerState.seconds === 0) stopTimerInterval(); updateTimerDisplay(); }, 1000); updateTimerDisplay(); }
+function renderTimer() { toolContent.innerHTML = `<div class="timer-wrap"><p class="timer-status" id="timerStatus">Ready when you are</p><div class="timer-display" id="timerDisplay">${timerText()}</div><div class="timer-settings"><label class="tool-label">Minutes<input class="tool-input" id="timerMinutes" type="number" min="1" max="240" value="${Math.round(timerState.duration / 60)}" /></label></div><div class="tool-actions" style="justify-content:center"><button class="tool-primary" type="button" id="timerStart">${timerState.running ? "Pause" : timerState.seconds < timerState.duration ? "Resume" : "Start"}</button><button class="tool-secondary" type="button" id="timerReset">Reset</button></div></div>`; updateTimerDisplay(); document.querySelector("#timerStart").addEventListener("click", () => { if (timerState.running) stopTimerInterval(); else startTimer(); renderTimer(); }); document.querySelector("#timerReset").addEventListener("click", () => { stopTimerInterval(); timerState.seconds = timerState.duration; renderTimer(); }); document.querySelector("#timerMinutes").addEventListener("change", (event) => { if (!timerState.running) { const minutes = Math.min(240, Math.max(1, Number(event.target.value) || 25)); timerState.duration = minutes * 60; timerState.seconds = timerState.duration; renderTimer(); } }); }
+
+const notesKey = "azeemAcademicSolutionNotes";
+let notes = (() => { try { const saved = JSON.parse(localStorage.getItem(notesKey) || "[]"); return Array.isArray(saved) ? saved : []; } catch { return []; } })();
+let editingNoteId = null;
+function saveNotes() { try { localStorage.setItem(notesKey, JSON.stringify(notes)); } catch { /* private browsing may disable storage */ } }
+function renderNotes() { const editing = notes.find((note) => note.id === editingNoteId); toolContent.innerHTML = `<div class="note-toolbar"><p>${notes.length} saved note${notes.length === 1 ? "" : "s"} on this device</p><button class="tool-secondary" type="button" id="newNote">+ New note</button></div><div class="note-editor"><label class="tool-label">Title<input class="tool-input" id="noteTitle" maxlength="100" value="${escapeHtml(editing?.title || "")}" placeholder="Research idea" /></label><label class="tool-label">Note<textarea class="note-input" id="noteBody" maxlength="5000" placeholder="Write a thought, task, or reminder…">${escapeHtml(editing?.body || "")}</textarea></label><div class="tool-actions"><button class="tool-primary" type="button" id="saveNote">${editing ? "Update note" : "Save note"}</button>${editing ? "<button class=\"tool-danger\" type=\"button\" id=\"deleteNote\">Delete note</button>" : ""}</div></div><div class="notes-list">${notes.length ? notes.map((note) => `<article class="note-card"><div class="note-card-head"><h3>${escapeHtml(note.title || "Untitled note")}</h3><button class="tool-secondary" type="button" data-edit-note="${note.id}">Edit</button></div><p>${escapeHtml(note.body)}</p><div class="note-date">Updated ${escapeHtml(new Date(note.updated).toLocaleString())}</div></article>`).join("") : "<div class=\"note-empty\">No notes yet. Your notes stay in this browser only.</div>"}</div>`;
+  document.querySelector("#newNote").addEventListener("click", () => { editingNoteId = null; renderNotes(); });
+  document.querySelector("#saveNote").addEventListener("click", () => { const title = document.querySelector("#noteTitle").value.trim(); const body = document.querySelector("#noteBody").value.trim(); if (!title && !body) return; if (editingNoteId) { const note = notes.find((item) => item.id === editingNoteId); if (note) { note.title = title; note.body = body; note.updated = Date.now(); } } else { notes.unshift({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, title, body, updated: Date.now() }); } saveNotes(); editingNoteId = null; renderNotes(); });
+  document.querySelector("#deleteNote")?.addEventListener("click", () => { notes = notes.filter((note) => note.id !== editingNoteId); saveNotes(); editingNoteId = null; renderNotes(); });
+  toolContent.querySelectorAll("[data-edit-note]").forEach((button) => button.addEventListener("click", () => { editingNoteId = button.dataset.editNote; renderNotes(); }));
+}
